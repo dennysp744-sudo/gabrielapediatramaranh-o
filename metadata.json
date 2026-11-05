@@ -1,0 +1,6 @@
+{
+  "name": "Dra. Gabriela Lara - Pediatria & Neonatologia",
+  "description": "Portal oficial da Dra. Gabriela Lara (CRM MA 7773, RQE 5632/6808). Agendamento de consultas pediátricas e neonatais, guia de puericultura, artigos de saúde infantil e suporte via WhatsApp em Açailândia/MA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
