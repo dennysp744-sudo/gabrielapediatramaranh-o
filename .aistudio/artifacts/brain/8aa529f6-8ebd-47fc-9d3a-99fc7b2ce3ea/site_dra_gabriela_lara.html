@@ -92,6 +92,9 @@
           </button>
         </div>
         <a href="tel:5599992099826" class="hover:text-white font-medium">📞 (99) 99209-9826</a>
+        <button onclick="openAdminModal()" class="hover:text-white flex items-center gap-1 text-[11px] bg-purple-800 px-2.5 py-0.5 rounded-full text-purple-200 cursor-pointer">
+          <span>🔒 Acesso Recepção</span>
+        </button>
       </div>
     </div>
   </div>
@@ -745,6 +748,48 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL: PAINEL DA RECEPÇÃO ==================== -->
+  <div id="modal-admin" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3">
+    <div class="relative bg-white w-full max-w-3xl rounded-3xl shadow-2xl border border-purple-200 overflow-hidden max-h-[92vh] flex flex-col">
+      <div class="p-5 bg-gradient-to-r from-purple-900 to-indigo-900 text-white flex justify-between items-center">
+        <div>
+          <h3 class="text-base font-bold text-white">Painel da Recepção • Consultas Recebidas</h3>
+          <p class="text-[11px] text-purple-200">MedClinic São Lucas • Dra. Gabriela Lara</p>
+        </div>
+        <button onclick="closeAdminModal()" class="text-white hover:text-purple-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- PIN Auth Box -->
+      <div id="admin-auth-box" class="p-8 text-center space-y-4">
+        <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center mx-auto text-xl font-bold">🔒</div>
+        <h4 class="font-bold text-slate-900 text-base">Acesso Restrito do Consultório</h4>
+        <p class="text-xs text-slate-500 max-w-sm mx-auto">Digite a senha da clínica para conferir os agendamentos feitos pelos pacientes no site.</p>
+        <div class="max-w-xs mx-auto space-y-2">
+          <input type="password" id="admin-pin-input" placeholder="PIN (Dica: CRM 7773)" class="w-full text-center p-2.5 border rounded-xl text-sm font-bold">
+          <button onclick="checkAdminPin()" class="w-full py-2.5 bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs rounded-xl">Entrar no Painel</button>
+          <p id="admin-pin-error" class="text-xs text-rose-600 font-bold hidden">PIN incorreto! Digite 7773.</p>
+        </div>
+      </div>
+
+      <!-- Content Table after login -->
+      <div id="admin-content-box" class="hidden p-5 overflow-y-auto space-y-4 text-xs">
+        <div class="flex justify-between items-center bg-purple-50 p-3 rounded-xl border border-purple-100">
+          <span class="font-bold text-purple-950">Lista de Pacientes Agendados no Site</span>
+          <button onclick="exportAdminCSV()" class="px-3 py-1 bg-white border rounded-lg text-purple-700 font-bold text-[11px]">Baixar Lista CSV</button>
+        </div>
+        <div id="admin-appointments-list" class="space-y-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 border-t border-slate-100 flex justify-end">
+        <button onclick="closeAdminModal()" class="px-4 py-1.5 bg-slate-200 text-slate-700 font-bold text-xs rounded-lg">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer class="bg-slate-950 text-slate-400 text-xs py-10 border-t border-slate-800 mt-12">
     <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
@@ -752,10 +797,11 @@
         <h4 class="text-sm font-bold text-white">Dra. Gabriela Lara | Pediatra e Neonatologista</h4>
         <p class="text-slate-500 mt-0.5">CRM MA 7773 • RQE 5632 / 6808 • MedClinic São Lucas, Açailândia - MA</p>
       </div>
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 flex-wrap justify-center">
         <a href="https://share.google/Nq5WHGLfnuOY9W4P7" target="_blank" class="hover:text-purple-300">Google Maps</a>
         <a href="https://www.instagram.com/ped.gabrielalara?xtok=OGlxYTBlY2hobTht" target="_blank" class="hover:text-pink-300">Instagram</a>
         <a href="tel:5599992099826" class="hover:text-white">(99) 99209-9826</a>
+        <button onclick="openAdminModal()" class="hover:text-purple-300 text-purple-400 font-semibold cursor-pointer">🔒 Acesso Recepção (PIN: 7773)</button>
       </div>
     </div>
   </footer>
@@ -1199,6 +1245,71 @@
       checked[id] = !checked[id];
       localStorage.setItem("dra_gabriela_vac_checked", JSON.stringify(checked));
       renderVaccines();
+    }
+
+    // ADMIN RECEPTION PANEL
+    function openAdminModal() {
+      document.getElementById("modal-admin").classList.remove("hidden");
+    }
+
+    function closeAdminModal() {
+      document.getElementById("modal-admin").classList.add("hidden");
+    }
+
+    function checkAdminPin() {
+      const pin = document.getElementById("admin-pin-input").value.trim();
+      const err = document.getElementById("admin-pin-error");
+      if (pin === "7773") {
+        document.getElementById("admin-auth-box").classList.add("hidden");
+        document.getElementById("admin-content-box").classList.remove("hidden");
+        err.classList.add("hidden");
+        renderAdminAppointments();
+      } else {
+        err.classList.remove("hidden");
+      }
+    }
+
+    function renderAdminAppointments() {
+      let list = JSON.parse(localStorage.getItem("dra_gabriela_appointments") || "[]");
+      if (list.length === 0) {
+        list = [
+          { child: "Theo Henrique Ribeiro", age: "14 dias", parent: "Juliana Ribeiro", phone: "(99) 98455-1234", type: "neonatologia", date: new Date().toISOString().split('T')[0], time: "09:00", status: "confirmado" },
+          { child: "Maria Alice Santos", age: "4 meses", parent: "Carlos Eduardo", phone: "(99) 99122-8765", type: "puericultura", date: new Date().toISOString().split('T')[0], time: "10:30", status: "pendente" }
+        ];
+        localStorage.setItem("dra_gabriela_appointments", JSON.stringify(list));
+      }
+
+      const container = document.getElementById("admin-appointments-list");
+      container.innerHTML = list.map(a => `
+        <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div>
+            <strong class="text-slate-900">${a.child} (${a.age})</strong>
+            <p class="text-purple-700 font-semibold">${a.type} • 📅 ${a.date} às ${a.time}</p>
+            <p class="text-slate-500">Resp: ${a.parent} • Tel: ${a.phone}</p>
+          </div>
+          <button onclick="replyPatientWhatsApp('${a.phone}', '${a.child}', '${a.date}', '${a.time}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs flex items-center gap-1 cursor-pointer">
+            <span>Chamar no WhatsApp</span>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function replyPatientWhatsApp(phone, child, date, time) {
+      const clean = phone.replace(/\D/g, '');
+      const num = clean.startsWith('55') ? clean : '55' + clean;
+      const msg = `Olá! Acompanhamos a solicitação de agendamento na MedClinic São Lucas para o(a) pequeno(a) *${child}* no dia *${date} às ${time}* com a Dra. Gabriela Lara. Gostaria de confirmar seu horário?`;
+      window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function exportAdminCSV() {
+      const list = JSON.parse(localStorage.getItem("dra_gabriela_appointments") || "[]");
+      const headers = "Data,Horario,Crianca,Idade,Responsavel,Telefone,Tipo\n";
+      const rows = list.map(a => `"${a.date}","${a.time}","${a.child}","${a.age}","${a.parent}","${a.phone}","${a.type}"`).join('\n');
+      const blob = new Blob(["\uFEFF" + headers + rows], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "consultas-dra-gabriela.csv";
+      link.click();
     }
   </script>
 </body>

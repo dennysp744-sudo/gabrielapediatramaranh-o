@@ -10,6 +10,7 @@ import { Footer } from './components/Footer';
 import { AppointmentModal } from './components/AppointmentModal';
 import { WhatsAppSupportModal } from './components/WhatsAppSupportModal';
 import { PrivacyModal } from './components/PrivacyModal';
+import { AdminPanelModal } from './components/AdminPanelModal';
 import { FloatingActions } from './components/FloatingActions';
 import { 
   Calendar, 
@@ -22,7 +23,9 @@ import {
   Phone,
   ArrowRight,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  Lock,
+  Building2
 } from 'lucide-react';
 import { APPOINTMENT_TYPES, CLINIC_INFO } from './data/mockData';
 import { AppointmentType } from './types';
@@ -32,6 +35,7 @@ export default function App() {
   const [isAppointmentOpen, setIsAppointmentOpen] = useState(false);
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [preselectedAppointmentType, setPreselectedAppointmentType] = useState<AppointmentType>('puericultura');
 
   const handleOpenAppointmentWithType = (type: AppointmentType) => {
@@ -48,6 +52,7 @@ export default function App() {
         setActiveTab={setActiveTab}
         onOpenAppointment={() => setIsAppointmentOpen(true)}
         onOpenWhatsApp={() => setIsWhatsAppOpen(true)}
+        onOpenAdmin={() => setIsAdminOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -218,6 +223,46 @@ export default function App() {
                 ))}
               </div>
 
+              {/* Reception Workflow Explanation Card */}
+              <div className="p-6 rounded-3xl bg-white border border-purple-100 shadow-sm space-y-3">
+                <div className="flex items-center gap-2 text-purple-950 font-bold text-sm">
+                  <Building2 className="w-5 h-5 text-purple-700" />
+                  <h3>Como a clínica e a Dra. Gabriela recebem os agendamentos?</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600 leading-relaxed pt-1">
+                  <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-100 space-y-1">
+                    <span className="font-bold text-emerald-950 flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                      1. Notificação Instantânea no WhatsApp da Clínica
+                    </span>
+                    <p>
+                      Ao finalizar o formulário, o paciente é direcionado para enviar os dados completos da criança diretamente ao WhatsApp oficial <strong>(99) 99209-9826</strong> da MedClinic São Lucas.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-purple-50/70 border border-purple-100 space-y-1">
+                    <span className="font-bold text-purple-950 flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-purple-600" />
+                      2. Registro no Painel da Recepção
+                    </span>
+                    <p>
+                      Todas as solicitações ficam catalogadas no <strong>Painel da Recepção</strong> com nome da criança, data e telefone, permitindo que a secretária confirme o horário com 1 clique.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex justify-end">
+                  <button
+                    onClick={() => setIsAdminOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Lock className="w-3.5 h-3.5 text-purple-700" />
+                    <span>Abrir Painel da Recepção (Acesso da Clínica - PIN: 7773)</span>
+                  </button>
+                </div>
+              </div>
+
               {/* Fast Booking Banner */}
               <div className="p-6 rounded-3xl bg-gradient-to-r from-purple-800 to-indigo-900 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="space-y-1 text-center sm:text-left">
@@ -302,6 +347,11 @@ export default function App() {
         onClose={() => setIsPrivacyOpen(false)}
       />
 
+      <AdminPanelModal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+      />
+
       {/* Footer */}
       <Footer
         onOpenPrivacy={() => setIsPrivacyOpen(true)}
@@ -311,6 +361,7 @@ export default function App() {
         }}
         onOpenAppointment={() => setIsAppointmentOpen(true)}
         onOpenWhatsApp={() => setIsWhatsAppOpen(true)}
+        onOpenAdmin={() => setIsAdminOpen(true)}
       />
 
     </div>

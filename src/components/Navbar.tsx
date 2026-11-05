@@ -10,7 +10,8 @@ import {
   X, 
   Sparkles,
   Sun,
-  Type
+  Type,
+  Lock
 } from 'lucide-react';
 import { CLINIC_INFO } from '../data/mockData';
 
@@ -19,13 +20,15 @@ interface NavbarProps {
   setActiveTab: (tab: string) => void;
   onOpenAppointment: () => void;
   onOpenWhatsApp: () => void;
+  onOpenAdmin?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
   onOpenAppointment,
-  onOpenWhatsApp
+  onOpenWhatsApp,
+  onOpenAdmin
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
@@ -114,6 +117,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               📞 {CLINIC_INFO.phoneDisplay}
             </a>
+
+            {onOpenAdmin && (
+              <>
+                <span className="hidden sm:inline text-purple-300">|</span>
+                <button
+                  onClick={onOpenAdmin}
+                  className="flex items-center gap-1 font-semibold text-[11px] text-purple-200 hover:text-white bg-purple-800/80 hover:bg-purple-700 px-2.5 py-0.5 rounded-full transition-colors cursor-pointer"
+                  title="Painel de Agendamentos da Recepção (PIN: 7773)"
+                >
+                  <Lock className="w-3 h-3 text-emerald-400" />
+                  <span>Acesso Recepção</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -263,6 +280,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Calendar className="w-4 h-4" />
               <span>Agendar Consulta Online</span>
             </button>
+
+            {onOpenAdmin && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenAdmin();
+                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-purple-900 text-purple-200 hover:text-white font-semibold text-xs mt-1"
+              >
+                <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Painel da Recepção (Consultas Recebidas)</span>
+              </button>
+            )}
           </div>
         </div>
       )}

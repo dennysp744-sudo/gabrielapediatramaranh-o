@@ -17,13 +17,15 @@ interface FooterProps {
   onNavigateTab: (tab: string) => void;
   onOpenAppointment: () => void;
   onOpenWhatsApp: () => void;
+  onOpenAdmin?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   onOpenPrivacy,
   onNavigateTab,
   onOpenAppointment,
-  onOpenWhatsApp
+  onOpenWhatsApp,
+  onOpenAdmin
 }) => {
   return (
     <footer className="bg-slate-900 text-slate-300 border-t border-slate-800">
@@ -178,7 +180,7 @@ export const Footer: React.FC<FooterProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap justify-center">
             <button
               onClick={onOpenPrivacy}
               className="hover:text-purple-300 transition-colors flex items-center gap-1 cursor-pointer"
@@ -186,8 +188,20 @@ export const Footer: React.FC<FooterProps> = ({
               <Lock className="w-3.5 h-3.5 text-emerald-500" />
               <span>Privacidade & LGPD</span>
             </button>
+            {onOpenAdmin && (
+              <>
+                <span>•</span>
+                <button
+                  onClick={onOpenAdmin}
+                  className="hover:text-purple-200 text-purple-400 font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Acesso Recepção / Consultório (PIN: 7773)</span>
+                </button>
+              </>
+            )}
             <span>•</span>
-            <span className="text-slate-600">Desenvolvido com carinho para as famílias de Açailândia</span>
+            <span className="text-slate-600">MedClinic São Lucas — Açailândia/MA</span>
           </div>
         </div>
       </div>
